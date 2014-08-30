@@ -206,7 +206,9 @@ module.exports = function (grunt) {
           ]
         }]
       },
-      server: '.tmp'
+      server: '.tmp',
+      coverage_server_unit: 'coverage/server/unit/*',
+      coverage_server_e2e: 'coverage/server/e2e/*'
     },
 
     // Add vendor prefixed styles
@@ -501,6 +503,7 @@ module.exports = function (grunt) {
     mocha_istanbul: {
       unit: {
         options: {
+          root: 'server',
           excludes: [
             '**/*.spec.js',
             '**/*.mock.js',
@@ -515,6 +518,7 @@ module.exports = function (grunt) {
       },
       e2e: {
         options: {
+          root: 'server',
           excludes: [
             '**/*.spec.js',
             '**/*.mock.js',
@@ -863,6 +867,7 @@ module.exports = function (grunt) {
         return grunt.task.run([
           'env:all',
           'env:test',
+          'clean:coverage_server_unit',
           'mocha_istanbul:unit'
         ]);
       }
@@ -871,6 +876,7 @@ module.exports = function (grunt) {
         return grunt.task.run([
           'env:all',
           'env:test',
+          'clean:coverage_server_e2e',
           'mocha_istanbul:e2e'
         ]);
       }
@@ -885,6 +891,8 @@ module.exports = function (grunt) {
         return grunt.task.run([
           'env:all',
           'env:test',
+          'clean:coverage_server_unit',
+          'clean:coverage_server_e2e',
           'mocha_istanbul',
           'istanbul_check_coverage'
         ]);

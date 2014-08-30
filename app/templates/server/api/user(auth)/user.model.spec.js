@@ -1,13 +1,26 @@
 'use strict';
 
-var app = require('../../app');
-var User = require('./user.model');
+var mongoose = require('mongoose'),
+    config = require('../../config/environment'),
+    User, user;
 
-var user = new User({
-  provider: 'local',
-  name: 'Fake User',
-  email: 'test@test.com',
-  password: 'password'
+before(function() {
+  // Connect to database
+  mongoose.connect(config.mongo.uri, config.mongo.options);
+
+  User = require('./user.model');
+
+  user = new User({
+    provider: 'local',
+    name: 'Fake User',
+    email: 'test@test.com',
+    password: 'password'
+  });
+});
+
+after(function() {
+  // Close database connection
+  mongoose.connection.close();
 });
 
 describe('User Model:', function() {
@@ -56,11 +69,11 @@ describe('User Model:', function() {
     describe('.authenticate()', function() {
 
       it("should authenticate user if password is valid", function() {
-        return user.authenticate('password').should.be.true;
+        user.authenticate('password').should.be.true;
       });
 
       it("should not authenticate user if password is invalid", function() {
-        return user.authenticate('blah').should.not.be.true;
+        user.authenticate('blah').should.not.be.true;
       });
 
     });
