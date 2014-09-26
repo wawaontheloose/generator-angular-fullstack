@@ -15,7 +15,7 @@ var Thing = require('./thing.model');
 function handleError(res, statusCode){
   statusCode = statusCode || 500;
   return function(err){
-    res.send(statusCode, err);
+    res.status(statusCode).send(err);
   };
 }
 
@@ -23,7 +23,7 @@ function responseWithResult(res, statusCode){
   statusCode = statusCode || 200;
   return function(entity){
     if(entity){
-      return res.json(statusCode, entity);
+      return res.status(statusCode).json(entity);
     }
   };
 }
@@ -31,7 +31,7 @@ function responseWithResult(res, statusCode){
 function handleEntityNotFound(res){
   return function(entity){
     if(!entity){
-      res.send(404);
+      res.status(404).end();
       return null;
     }
     return entity;
@@ -53,7 +53,7 @@ function removeEntity(res){
     if(entity){
       return entity.removeAsync()
         .then(function() {
-          return res.send(204);
+          return res.status(204).end();
         });
     }
   };

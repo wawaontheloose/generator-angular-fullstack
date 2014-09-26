@@ -8,21 +8,21 @@ var jwt = require('jsonwebtoken');
 var validationError = function(res, statusCode) {
   statusCode = statusCode || 422;
   return function(err){
-    res.json(statusCode, err);
+    res.status(statusCode).json(err);
   };
 };
 
 function handleError(res, statusCode){
   statusCode = statusCode || 500;
   return function(err){
-    res.send(statusCode, err);
+    res.status(statusCode).send(err);
   };
 }
 
 function respondWith(res, statusCode){
   statusCode = statusCode || 200;
   return function(){
-    res.send(statusCode);
+    res.status(statusCode).end();
   };
 }
 
@@ -33,7 +33,7 @@ function respondWith(res, statusCode){
 exports.index = function(req, res) {
   User.findAsync({}, '-salt -hashedPassword')
     .then(function (users) {
-      res.json(200, users);
+      res.json(users);
     })
     .catch(handleError(res));
 };
@@ -62,7 +62,7 @@ exports.show = function (req, res, next) {
   User.findByIdAsync(userId)
     .then(function (user) {
       if(!user) {
-        return res.send(401);
+        return res.status(401).end();
       }
       res.json(user.profile);
     })
@@ -97,7 +97,7 @@ exports.changePassword = function(req, res, next) {
           .spread(respondWith(res, 200))
           .catch(validationError(res));
       } else {
-        return res.send(403);
+        return res.status(403).end();
       }
     });
 };
@@ -110,7 +110,7 @@ exports.me = function(req, res, next) {
 
   User.findOneAsync({ _id: userId }, '-salt -hashedPassword')
     .then(function(user) { // don't ever give out the password or salt
-      if (!user) { return res.json(401); }
+      if (!user) { return res.status(401).end(); }
       res.json(user);
     })
     .catch(function(err){ return next(err); });

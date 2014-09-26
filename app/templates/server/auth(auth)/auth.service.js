@@ -28,7 +28,7 @@ function isAuthenticated() {
       User.findByIdAsync(req.user._id)
         .then(function (user) {
           if (!user) {
-            return res.send(401);
+            return res.status(401).end();
           }
           req.user = user;
           next();
@@ -54,7 +54,7 @@ function hasRole(roleRequired) {
         next();
       }
       else {
-        res.send(403);
+        res.status(403).end();
       }
     });
 }
@@ -71,7 +71,7 @@ function signToken(id) {
  */
 function setTokenCookie(req, res) {
   if (!req.user) {
-    return res.json(404, { message: 'Something went wrong, please try again.'});
+    return res.status(404).json({ message: 'Something went wrong, please try again.'});
   }
   var token = signToken(req.user._id, req.user.role);
   res.cookie('token', JSON.stringify(token));
