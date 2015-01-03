@@ -30,7 +30,13 @@
     "connect-mongo": "^0.4.1"<% } %><% if (filters.socketio) { %>,
     "socket.io": "^1.0.6",
     "socket.io-client": "^1.0.6",
-    "socketio-jwt": "^2.0.2"<% } %>
+    "socketio-jwt": "^2.0.2"<% } %><% if (filters.email) { %>,
+    "nodemailer": "^1.3.0",
+    "email-templates": "^1.1.2"<% for (var i = 0, mailTransportsLength = mailTransports.length; i < mailTransportsLength; i++) { %>,
+    "nodemailer-<%= mailTransports[i] %>": "latest"<% } %><% if (filters.less) { %>,
+    "less": "^1.7.2"<% } %><% if (filters.sass) { %>,
+    "node-sass": "^1.2.3"<% } %><% if (filters.stylus) { %>,
+    "stylus": "^0.49.0"<% } %><% } %>
   },
   "devDependencies": {
     "grunt": "~0.4.4",

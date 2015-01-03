@@ -58,6 +58,8 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
           jasmine: true
         });
 
+        this.mailTransports = this.config.get('mailTransports');
+
         // NOTE: temp(?) fix for #403
         if(typeof this.filters.oauth==='undefined') {
           var strategies = Object.keys(this.filters).filter(function(key) {
@@ -145,6 +147,49 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     this.log('\n# Server\n');
 
     this.prompt([{
+      type: 'confirm',
+      name: 'email',
+      message: 'Would you like to scaffold out a mailer boilerplate?',
+    }, {
+      type: 'checkbox',
+      name: 'mailTransports',
+      message: 'Nodemailer comes with smtp and direct transports built-in. Would you like to include additional transports?',
+      when: function (answers) {
+        return answers.email;
+      },
+      choices: [
+        {
+          value: 'smtp-pool',
+          name: 'nodemailer-smtp-pool',
+          checked: false
+        },
+        {
+          value: 'ses-transport',
+          name: 'nodemailer-ses-transport',
+          checked: false
+        },
+        {
+          value: 'sendmail-transport',
+          name: 'nodemailer-sendmail-transport',
+          checked: false
+        },
+        {
+          value: 'stub-transport',
+          name: 'nodemailer-stub-transport',
+          checked: false
+        },
+        {
+          value: 'pickup-transport',
+          name: 'nodemailer-pickup-transport',
+          checked: false
+        },
+        {
+          value: 'sendgrid-transport',
+          name: 'nodemailer-sendgrid-transport',
+          checked: false
+        }
+      ]
+    }, {
       type: 'checkbox',
       name: 'odms',
       message: 'What would you like to use for data modeling?',
@@ -235,6 +280,10 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
           this.filters[oauthStrategy] = true;
         }.bind(this));
       }
+      if(answers.email) {
+        this.filters.email = true;
+        this.mailTransports = answers.mailTransports;
+      }
 
       cb();
     }.bind(this));
@@ -305,6 +354,8 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     this.config.set('insertModels', true);
     this.config.set('registerModelsFile', 'server/sqldb/index.js');
     this.config.set('modelsNeedle', '// Insert models below');
+
+    this.config.set('mailTransports', this.mailTransports);
 
     this.config.set('filters', this.filters);
     this.config.forceSave();

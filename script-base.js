@@ -28,6 +28,7 @@ var Generator = module.exports = function Generator() {
   }.bind(this);
 
   this.filters = this.config.get('filters');
+  this.mailTransports = this.config.get('mailTransports');
   this.sourceRoot(path.join(__dirname, '/templates'));
 };
 

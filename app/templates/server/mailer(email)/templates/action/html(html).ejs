@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title><%%= title %></title>
+</head>
+
+<body>
+
+<table class="body-wrap">
+  <tr>
+    <td></td>
+    <td class="container" width="600">
+      <div class="content">
+        <table class="main" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="content-wrap">
+              <table width="100%" cellpadding="0" cellspacing="0"><%% function contentBlock(c) { %>
+                <tr>
+                  <td class="content-block">
+                    <%%= c %>
+                  </td>
+                </tr><%% } %><%% function actionBlock(a) { %>
+                <tr>
+                  <td class="content-block">
+                    <a href="<%%= a.href %>" class="btn-primary"><%%= a.text %></a>
+                  </td>
+                </tr><%% } %><%% if (content) { if (Array.isArray(content)) { for (var i = 0, cLength = content.length; i < cLength; i++) { %>
+                <%%- contentBlock(content[i]) %><%% }} else { %>
+                <%%- contentBlock(content) %><%% }} %><%% if (action) { if (Array.isArray(action)) { for (var i = 0, aLength = action.length; i < aLength; i++) { %>
+                <%%- actionBlock(action[i]) %><%% }} else { %>
+                <%%- actionBlock(action) %><%% }} %><%% if (signature) { %>
+                <tr>
+                  <td class="content-block">
+                    <%%= signature %>
+                  </td>
+                </tr><%% } %>
+              </table>
+            </td>
+          </tr>
+        </table><%% if (footer) { %>
+        <div class="footer">
+          <table width="100%">
+            <tr>
+              <td class="aligncenter content-block"><%%= footer %></td>
+            </tr>
+          </table>
+        </div><%% } %></div>
+    </td>
+    <td></td>
+  </tr>
+</table>
+
+</body>
+</html>
