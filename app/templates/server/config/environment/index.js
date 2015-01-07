@@ -26,8 +26,18 @@ var all = {
 
   // Secret for session, you will want to change this and make it an environment variable
   secrets: {
-    session: '<%= _.slugify(_.humanize(appname)) + '-secret' %>'
-  },
+    session: '<%= _.slugify(_.humanize(appname)) + '-secret' %>'<% if (filters.userEmails) { %>,
+    verify: '<%= _.slugify(_.humanize(appname)) + '-verify-secret' %>',
+    account: '<%= _.slugify(_.humanize(appname)) + '-account-secret' %>'<% } %>
+  }<% if (filters.userEmails) { %>,
+
+  // User account options
+  userAccounts: {
+    verifyNewEmail: true,
+    verifyEmailCallbackURL: (process.env.DOMAIN || '') + '/verifyemail',
+    passwordReset: true,
+    passwordResetCallbackURL: (process.env.DOMAIN || '') + '/resetpassword'
+  }<% } %>,
 
   // List of user roles
   userRoles: ['guest', 'user', 'admin'],

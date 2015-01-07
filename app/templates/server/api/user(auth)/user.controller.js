@@ -6,7 +6,8 @@ var sqldb = require('../../sqldb');
 var User = sqldb.User;<% } %>
 var passport = require('passport');
 var config = require('../../config/environment');
-var jwt = require('jsonwebtoken');
+var jwt = require('jsonwebtoken');<% if (filters.userEmails) { %>
+var mailer = requier('../../mailer');<% } %>
 
 var validationError = function(res, statusCode) {
   statusCode = statusCode || 422;
@@ -166,4 +167,61 @@ exports.me = function(req, res, next) {
  */
 exports.authCallback = function(req, res, next) {
   res.redirect('/');
+};<% if (filters.userEmails) { %>
+
+exports.sendEmailVerification = function(req, res, next) {
+  if (!req.body || !req.body.email) { return res.status(400).send('no email supplied'); }
+
+  var token = jwt.sign(req.body, config.secrets.verify);
+  var verifyCallback = config.userAccounts.verifyEmailCallbackURL + '?token=' + token;
+  var userName = req.body.name || '<%= appname %> user';
+
+  mailer.sendMail({
+    to: req.body.email,
+    subject: 'Verify your email address',
+    name: userName,
+    link: verifyCallback
+  }, {
+    template: 'verify-email-address'
+  }, function(err) {
+    if (err) { return res.status(500).send(); }
+    res.send();
+  });
 };
+
+exports.sendPasswordReset = function(req, res, next) {
+  if (!req.body || !req.body.email) { return res.status(400).send('no email supplied'); }
+
+  <% if (filters.mongooseModels) { %>User.findByIdAsync(userId)<% }
+     if (filters.sequelizeModels) { %>User.find({
+    where: {
+      email: req.body.email
+    }
+  })<% } %>
+    .then(function(user) {
+      if (!user) {
+        return res.send(404);
+      }
+
+      var token = jwt.sign({ _id: user._id }, config.secrets.account, {
+        expiresInMinutes: 60
+      });
+      var resetCallback = config.userAccounts.verifyEmailCallbackURL + '?token=' + token;
+      var userName = req.body.name || '<%= appname %> user';
+
+      mailer.sendMail({
+        to: req.body.email,
+        subject: 'Reset your password',
+        name: userName,
+        link: resetCallback
+      }, {
+        template: 'reset-password'
+      }, function(err) {
+        if (err) { return res.status(500).send(); }
+        res.send();
+      });
+    })
+    .catch(function(err) {
+      return next(err);
+    });
+};<% } %>

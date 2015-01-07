@@ -249,6 +249,13 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
       ]
     }, {
       type: 'confirm',
+      name: 'userEmails',
+      message: 'Would you like to allow email confirmation and password recovery?',
+      when: function (answers) {
+        return answers.email && answers.auth;
+      }
+    }, {
+      type: 'confirm',
       name: 'socketio',
       message: 'Would you like to use socket.io?',
       // to-do: should not be dependent on ODMs
@@ -284,6 +291,7 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         this.filters.email = true;
         this.mailTransports = answers.mailTransports;
       }
+      if (answers.userEmails) this.filters.userEmails = true;
 
       cb();
     }.bind(this));

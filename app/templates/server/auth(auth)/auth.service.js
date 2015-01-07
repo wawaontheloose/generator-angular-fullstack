@@ -89,9 +89,32 @@ function setTokenCookie(req, res) {
   var token = signToken(req.user._id, req.user.role);
   res.cookie('token', JSON.stringify(token));
   res.redirect('/');
-}
+}<% if (filters.userEmails) { %>
+
+exports.verifyRequestToken = function(secret, enabled) {
+  enabled = (arguments.length >= 2) ? enabled : true;
+  return function(req, res, next) {
+    if (!enabled) { return next(); }
+    if (!req.query.token || (!req.body || !req.body.token)) { return res.status(401).send('no token supplied'); }
+    var token = req.query.token || req.body.token;
+
+    jwt.verify(token, secret, function(err, obj) {
+      if (err) { return res.status(401).send('there was an error with the supplied token'); }
+      if (req.body) {
+        delete req.body.token;
+        for (var k in obj) {
+          if (k !== 'iat') req.body[k] = obj[k];
+        }
+      } else {
+        req.body = obj;
+      }
+      next();
+    });
+  };
+};<% } %>
 
 exports.isAuthenticated = isAuthenticated;
 exports.hasRole = hasRole;
 exports.signToken = signToken;
-exports.setTokenCookie = setTokenCookie;
+exports.setTokenCookie = setTokenCookie;<% if (filters.userEmails) { %>
+exports.verifyEmailToken = verifyEmailToken;<% } %>
