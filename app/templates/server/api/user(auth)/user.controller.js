@@ -7,7 +7,7 @@ var User = sqldb.User;<% } %>
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');<% if (filters.userEmails) { %>
-var mailer = requier('../../mailer');<% } %>
+var mailer = require('../../mailer');<% } %>
 
 var validationError = function(res, statusCode) {
   statusCode = statusCode || 422;
