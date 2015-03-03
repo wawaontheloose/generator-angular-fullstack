@@ -17,199 +17,113 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
-  // Define the configuration for all the tasks
+  // Define the project level configuration
   var config = {
     // load-grunt-config settings
     config: {
-      src: 'grunt/config/**.js',
+      src: 'grunt/{client,server}/config/**.js',
       mergeCustomizer: function(a, b) {
         return Array.isArray(a) ? a.concat(b) : undefined;
       }
     },
 
-    // Project settings
+    // Project config
     yeoman: {
       client: require('./bower.json').appPath || 'client',
       dist: 'dist'
     },
-    pkg: grunt.file.readJSON('./package.json')
+    pkg: grunt.file.readJSON('./package.json'),
+
+    // Project level watch config
+    watch: {
+      gruntfile: {
+        files: ['Gruntfile.js']
+      }
+    },
+
+    // Project build control config
+    buildcontrol: {
+      options: {
+        dir: 'dist',
+        commit: true,
+        push: true,
+        connectCommits: false,
+        message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
+      },
+      heroku: {
+        options: {
+          remote: 'heroku',
+          branch: 'master'
+        }
+      },
+      openshift: {
+        options: {
+          remote: 'openshift',
+          branch: 'master'
+        }
+      }
+    },
+
+    jshint: {
+      options: {
+        reporter: require('jshint-stylish')
+      }
+    }
   };
+
+  // Load client, server, and project configs
   grunt.initConfig(require('load-grunt-configs')(grunt, config));
 
-  // Used for delaying livereload until after server has restarted
-  grunt.registerTask('wait', function () {
-    grunt.log.ok('Waiting for server reload...');
+  // Load client and server tasks
+  grunt.loadTasks('grunt/client/tasks');
+  grunt.loadTasks('grunt/server/tasks');
 
-    var done = this.async();
+  // Project serve task
+  grunt.registerTask('serve', function(target) {
+    target = (target ? ':' + target : '');
 
-    setTimeout(function () {
-      grunt.log.writeln('Done waiting!');
-      done();
-    }, 1500);
+    grunt.task.run(['assets' + target, 'server' + target]);
   });
 
-  grunt.registerTask('express-keepalive', 'Keep grunt running', function() {
-    this.async();
-  });
+  // Project build task
+  grunt.registerTask('build', ['assets:dist']);
 
-  grunt.registerTask('serve', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'env:all', 'env:prod', 'express:prod', 'wait', 'open', 'express-keepalive']);
-    }
-
-    if (target === 'debug') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',<% if (filters.stylus) { %>
-        'injector:stylus', <% } %><% if (filters.less) { %>
-        'injector:less', <% } %><% if (filters.sass) { %>
-        'injector:sass', <% } %>
-        'concurrent:server',
-        'injector',
-        'wiredep',
-        'autoprefixer',
-        'concurrent:debug'
-      ]);
-    }
-
-    grunt.task.run([
-      'clean:server',
-      'env:all',<% if (filters.stylus) { %>
-      'injector:stylus', <% } %><% if (filters.less) { %>
-      'injector:less', <% } %><% if (filters.sass) { %>
-      'injector:sass', <% } %>
-      'concurrent:server',
-      'injector',
-      'wiredep',
-      'autoprefixer',
-      'express:dev',
-      'wait',
-      'open',
-      'watch'
-    ]);
-  });
-
-  grunt.registerTask('server', function () {
-    grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-    grunt.task.run(['serve']);
-  });
-
+  // Project test task
   grunt.registerTask('test', function(target, option) {
+    option = (option ? ':' + option : '');
     if (target === 'server') {
-      return grunt.task.run([
-        'env:all',
-        'env:test',
-        'mochaTest:unit',
-        'mochaTest:integration'
-      ]);
+      return grunt.task.run(['testServer' + option]);
     }
 
-    else if (target === 'client') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',<% if (filters.stylus) { %>
-        'injector:stylus', <% } %><% if (filters.less) { %>
-        'injector:less', <% } %><% if (filters.sass) { %>
-        'injector:sass', <% } %>
-        'concurrent:test',
-        'injector',
-        'autoprefixer',
-        'karma'
-      ]);
+    if (target === 'client') {
+      return grunt.task.run(['testClient']);
     }
 
-    else if (target === 'e2e') {
+    if (target === 'e2e') {
 
       if (option === 'prod') {
         return grunt.task.run([
-          'build',
-          'env:all',
-          'env:prod',
-          'express:prod',
-          'protractor'
+          'assets:dist',
+          'server:dist',
+          'testClient:integration:skip-assets'
         ]);
       }
 
-      else {
-        return grunt.task.run([
-          'clean:server',
-          'env:all',
-          'env:test',<% if (filters.stylus) { %>
-          'injector:stylus', <% } %><% if (filters.less) { %>
-          'injector:less', <% } %><% if (filters.sass) { %>
-          'injector:sass', <% } %>
-          'concurrent:test',
-          'injector',
-          'wiredep',
-          'autoprefixer',
-          'express:dev',
-          'protractor'
-        ]);
-      }
+      return grunt.task.run([
+        'assets',
+        'server',
+        'testClient:integration:skip-assets'
+      ]);
     }
 
-    else if (target === 'coverage') {
-
-      if (option === 'unit') {
-        return grunt.task.run([
-          'env:all',
-          'env:test',
-          'mocha_istanbul:unit'
-        ]);
-      }
-
-      else if (option === 'integration') {
-        return grunt.task.run([
-          'env:all',
-          'env:test',
-          'mocha_istanbul:integration'
-        ]);
-      }
-
-      else if (option === 'check') {
-        return grunt.task.run([
-          'istanbul_check_coverage'
-        ]);
-      }
-
-      else {
-        return grunt.task.run([
-          'env:all',
-          'env:test',
-          'mocha_istanbul',
-          'istanbul_check_coverage'
-        ]);
-      }
-
+    if (target === 'coverage') {
+      return grunt.task.run(['testServer:coverage']);
     }
 
-    else grunt.task.run([
-      'test:server',
-      'test:client'
-    ]);
+    grunt.task.run(['testClient', 'testServer']);
   });
 
-  grunt.registerTask('build', [
-    'clean:dist',<% if (filters.stylus) { %>
-    'injector:stylus', <% } %><% if (filters.less) { %>
-    'injector:less', <% } %><% if (filters.sass) { %>
-    'injector:sass', <% } %>
-    'concurrent:dist',
-    'injector',
-    'wiredep',
-    'useminPrepare',
-    'autoprefixer',
-    'ngtemplates',
-    'concat',
-    'ngAnnotate',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin'
-  ]);
-
+  // Project default task
   grunt.registerTask('default', [
     'newer:jshint',
     'test',
