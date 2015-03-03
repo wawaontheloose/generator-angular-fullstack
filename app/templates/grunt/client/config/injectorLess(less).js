@@ -1,6 +1,6 @@
 module.exports.tasks = {
   injector: {
-    sass: {
+    less: {
       options: {
         transform: function(filePath) {
           filePath = filePath.replace('/client/app/', '');
@@ -11,17 +11,10 @@ module.exports.tasks = {
         endtag: '// endinjector'
       },
       files: {
-        '<%%= yeoman.client %>/app/app.scss': ['<%%= yeoman.client %>/{app,components}/**/*.{scss,sass}',
-          '!<%%= yeoman.client %>/app/app.{scss,sass}'
+        '<%%= yeoman.client %>/app/app.less': ['<%%= yeoman.client %>/{app,components}/**/*.less',
+          '!<%%= yeoman.client %>/app/app.less'
         ]
       }
-    }
-  },
-
-  watch: {
-    injectSass: {
-      files: ['<%%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
-      tasks: ['injector:sass']
     }
   }
 };

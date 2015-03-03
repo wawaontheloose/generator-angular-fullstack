@@ -12,18 +12,5 @@ module.exports.tasks = {
         '.tmp/app/app.css': '<%%= yeoman.client %>/app/app.styl'
       }
     }
-  },
-
-  concurrent: {
-    server: ['stylus'],
-    test: ['stylus'],
-    dist: ['stylus']
-  },
-
-  watch: {
-    stylus: {
-      files: ['<%%= yeoman.client %>/{app,components}/**/*.styl'],
-      tasks: ['stylus', 'autoprefixer']
-    }
   }
 };

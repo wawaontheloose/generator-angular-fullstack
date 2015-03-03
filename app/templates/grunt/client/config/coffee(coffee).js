@@ -18,9 +18,8 @@ module.exports.tasks = {
   },
 
   concurrent: {
-    server: ['coffee'],
-    test: ['coffee'],
-    dist: ['coffee']
+    assetsCompile: ['coffee'],
+    assetsDist: ['coffee']
   },
 
   watch: {

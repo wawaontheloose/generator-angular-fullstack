@@ -1,7 +1,4 @@
 module.exports = {
-  gruntfile: {
-    files: ['Gruntfile.js']
-  },
   livereload: {
     files: ['{.tmp,<%%= yeoman.client %>}/{app,components}/**/*.css',
       '{.tmp,<%%= yeoman.client %>}/{app,components}/**/*.html',

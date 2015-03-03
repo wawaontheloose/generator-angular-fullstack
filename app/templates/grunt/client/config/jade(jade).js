@@ -17,9 +17,8 @@ module.exports.tasks = {
   },
 
   concurrent: {
-    server: ['jade'],
-    test: ['jade'],
-    dist: ['jade']
+    assetsCompile: ['jade'],
+    assetsDist: ['jade']
   },
 
   watch: {

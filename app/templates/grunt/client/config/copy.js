@@ -17,10 +17,6 @@ module.exports = {
       cwd: '.tmp/images',
       dest: '<%%= yeoman.dist %>/client/assets/images',
       src: ['generated/*']
-    }, {
-      expand: true,
-      dest: '<%%= yeoman.dist %>',
-      src: ['package.json', 'server/**/*']
     }]
   },
   styles: {

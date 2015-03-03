@@ -12,18 +12,5 @@ module.exports.tasks = {
         '.tmp/app/app.css': '<%%= yeoman.client %>/app/app.scss'
       }
     }
-  },
-
-  concurrent: {
-    server: ['sass'],
-    test: ['sass'],
-    dist: ['sass']
-  },
-
-  watch: {
-    sass: {
-      files: ['<%%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
-      tasks: ['sass', 'autoprefixer']
-    }
   }
 };

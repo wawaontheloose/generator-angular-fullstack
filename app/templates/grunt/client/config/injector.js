@@ -37,6 +37,10 @@ module.exports.tasks = {
     }
   },
 
+  concurrent: {
+    assetsWire: ['injector:scripts', 'injector:css']
+  },
+
   watch: {
     injectJS: {
       files: ['<%%= yeoman.client %>/{app,components}/**/*.js',

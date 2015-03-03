@@ -11,18 +11,5 @@ module.exports.tasks = {
         '.tmp/app/app.css': '<%%= yeoman.client %>/app/app.less'
       }
     }
-  },
-
-  concurrent: {
-    server: ['less'],
-    test: ['less'],
-    dist: ['less']
-  },
-
-  watch: {
-    less: {
-      files: ['<%%= yeoman.client %>/{app,components}/**/*.less'],
-      tasks: ['less', 'autoprefixer']
-    }
   }
 };

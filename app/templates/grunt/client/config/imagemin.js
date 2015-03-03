@@ -11,6 +11,6 @@ module.exports.tasks = {
   },
 
   concurrent: {
-    dist: ['imagemin']
+    assetsDist: ['imagemin']
   }
 };
