@@ -95,7 +95,7 @@ exports.verifyRequestToken = function(secret, enabled) {
   enabled = (arguments.length >= 2) ? enabled : true;
   return function(req, res, next) {
     if (!enabled) { return next(); }
-    if (!req.query.token || (!req.body || !req.body.token)) { return res.status(401).send('no token supplied'); }
+    if (!req.query.token && (!req.body || !req.body.token)) { return res.status(401).send('no token supplied'); }
     var token = req.query.token || req.body.token;
 
     jwt.verify(token, secret, function(err, obj) {
